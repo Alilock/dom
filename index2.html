@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+    <header class="header">
+
+        <h1 class="title">Cities</h1>
+        <img class="weathericon" src="" alt="">
+        <h1 class="myposition"></h1>
+    </header>
+    <section class="info">
+        <div class="leftside">
+            <ul class="list">
+                <li>
+                    <a id="1" href="#">London</a>
+                </li>
+                <li>
+                    <a id="2" href="#">Tokyo</a>
+
+                </li>
+                <li>
+                    <a id="3" href="#">Naxçıvan</a>
+                </li>
+                <li>
+                    <a id="4" href="#">Ordubad</a>
+                </li>
+            </ul>
+        </div>
+        <div class="rightside">
+            <h2 class="rightside-title">Title</h2>
+            <p class="info1">click city and get information</p>
+            <div class="imageWrapper">
+                <img class="image"
+                    src="https://www.komar.de/en/media/catalog/product/cache/5/image/9df78eab33525d08d6e5fb8d27136e95/I/A/IAX10-0027.jpg"
+                    alt="city" />
+            </div>
+
+        </div>
+    </section>
+    <footer class="footer">
+        <h3>Footer</h3>
+    </footer>
+</body>
+
+<script>
+    // const h1 = document.querySelector('.title')
+    // console.log(h1);
+    const titles = document.querySelectorAll('.title')
+    // console.log(titles);
+    const links = document.querySelectorAll(".list li a")
+
+    // const rightside = document.querySelector('.rightside')
+    // console.log(rightside.innerText);
+    const title = document.querySelector('.rightside-title')
+    const info1 = document.querySelector('.info1')
+    const image = document.querySelector(".image")
+    const options = {
+        enableHighAccuracy: true,
+        timeout: 50000,
+        maximumAge: 0,
+    };
+    function success(pos) {
+        const crd = pos.coords;
+        // document.querySelector(".myposition").innerText = `${crd.latitude} ${crd.longitude}`
+        const lon = crd.longitude
+        const lat = crd.latitude
+
+        getWeather(lat, lon)
+    }
+
+    function getWeather(lat, lon) {
+        fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=b74796c32de0943ffb3b350b82a921d6&units=metric`)
+            .then(res => res.json())
+            .then(res => {
+                let icon = res.weather[0].icon
+                let degree = res.main.temp
+                document.querySelector('.weathericon').src = `https://openweathermap.org/img/w/${icon}.png`
+                document.querySelector(".myposition").innerText = `${degree}`
+                console.log(icon + degree);
+            })
+    }
+    function error(err) {
+        console.warn(`ERROR(${err.code}): ${err.message}`);
+    }
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
+
+
+
+
+
+
+    links.forEach(link => {
+        link.addEventListener("click", e => {
+
+            e.preventDefault()
+            links.forEach(link => link.parentElement.style.backgroundColor = 'aqua')
+            link.parentElement.style.backgroundColor = "#fff"
+            let id = link.id
+            fetch(`https://643d0774f0ec48ce904fcb4e.mockapi.io/city/${id}`).then(res => res.json())
+                .then(res => {
+                    title.innerText = res.name
+                    info1.innerText = res.description
+                    image.src = res.image
+                    getWeather(res.lat, res.long)
+                })
+
+        })
+    })
+
+
+</script>
+
+</html>
